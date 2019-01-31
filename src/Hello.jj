@@ -5,7 +5,8 @@ import java.io.StringReader;
 public class Hello {
   
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Hey : Boolean  ; Position : {Agrd, Red, Ferm} ; Xpos, Ypos : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm and Position :=true}");
+      StringReader in=new StringReader(
+"DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Hey : Boolean  ; Position : {Agrd, Red, Ferm} ; Xpos, Ypos : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; FenP::Visible := True; ACTIONS { Click(item) + Click(item) ;{Click(item) + Click(item)} }");
       Hello hello=new Hello(in);
       Hello.words();
     }
@@ -96,20 +97,27 @@ TOKEN :
   >
 }
 
+
+
+TOKEN :
+{
+ <ALTERNATIF : "~">
+}
+
 TOKEN :
 {
   < IF : "if" >
 | < THEN : "then" >
 | < DEBUT : "DEBUT">
 | < FIN : "FIN" >
-| < ACTION : "Actions" >
+| < ACTION : "ACTIONS" >
 | < COMP : "COMP" >
 | < PROP :"PROP" >
 | < EVT : "EVT" >
 | < INTERFACE : "INTERFACE" >
 | < TRUE : "True" >
 | < FALSE : "False" >
-| < INITIALISATION :"INITIALISATION">
+| < INITIALISATION :"INITIALISATIONS">
 | <END:"END">
 | <AFFECT:":=">
 | <AND:"and">
@@ -133,11 +141,11 @@ void words():
   <DEBUT>
   <INTERFACE>
   interfaces()
-  /*<INITIALISATION>
+  <INITIALISATION>
   initialisations()
   <ACTION>
   actions()
-  <END>*/
+  //<END>
   <EOF>
 }
 void interfaces():
@@ -151,13 +159,37 @@ void interfaces():
 void initialisations():
 {}
 {
- <DEBUT>
+  (init()<SEMICOLON>)+
+
+
 }
+
+void init():{}{
+
+id()
+<COLON><COLON>
+id()
+<AFFECT>
+attribut_val()
+
+
+
+}
+
 
 void actions():
 {}
 {
-<DEBUT>
+<OBRACE>
+<EvtType>
+(<OPAR>
+id()
+<CPAR>)?
+(
+(<SEMICOLON>|<PLUS>|<ALTERNATIF>)
+((<EvtType><OPAR>id()<CPAR>)|actions())
+)*
+<CBRACE>
 }
 
 
@@ -229,7 +261,7 @@ void evt():
  <AFFECT>
  attribut_val()
  (
-  <AND>
+  (<AND>|<SEMICOLON>)
    id_prop()
    <AFFECT>
    attribut_val()

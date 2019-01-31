@@ -45,39 +45,41 @@ public interface HelloConstants {
   /** RegularExpression Id. */
   int EVT_COND = 22;
   /** RegularExpression Id. */
-  int IF = 23;
+  int ALTERNATIF = 23;
   /** RegularExpression Id. */
-  int THEN = 24;
+  int IF = 24;
   /** RegularExpression Id. */
-  int DEBUT = 25;
+  int THEN = 25;
   /** RegularExpression Id. */
-  int FIN = 26;
+  int DEBUT = 26;
   /** RegularExpression Id. */
-  int ACTION = 27;
+  int FIN = 27;
   /** RegularExpression Id. */
-  int COMP = 28;
+  int ACTION = 28;
   /** RegularExpression Id. */
-  int PROP = 29;
+  int COMP = 29;
   /** RegularExpression Id. */
-  int EVT = 30;
+  int PROP = 30;
   /** RegularExpression Id. */
-  int INTERFACE = 31;
+  int EVT = 31;
   /** RegularExpression Id. */
-  int TRUE = 32;
+  int INTERFACE = 32;
   /** RegularExpression Id. */
-  int FALSE = 33;
+  int TRUE = 33;
   /** RegularExpression Id. */
-  int INITIALISATION = 34;
+  int FALSE = 34;
   /** RegularExpression Id. */
-  int END = 35;
+  int INITIALISATION = 35;
   /** RegularExpression Id. */
-  int AFFECT = 36;
+  int END = 36;
   /** RegularExpression Id. */
-  int AND = 37;
+  int AFFECT = 37;
   /** RegularExpression Id. */
-  int NUMERIQUE = 38;
+  int AND = 38;
   /** RegularExpression Id. */
-  int ALPHANUMERIQUE = 39;
+  int NUMERIQUE = 39;
+  /** RegularExpression Id. */
+  int ALPHANUMERIQUE = 40;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -107,18 +109,19 @@ public interface HelloConstants {
     "\"int\"",
     "<EvtType>",
     "<EVT_COND>",
+    "\"~\"",
     "\"if\"",
     "\"then\"",
     "\"DEBUT\"",
     "\"FIN\"",
-    "\"Actions\"",
+    "\"ACTIONS\"",
     "\"COMP\"",
     "\"PROP\"",
     "\"EVT\"",
     "\"INTERFACE\"",
     "\"True\"",
     "\"False\"",
-    "\"INITIALISATION\"",
+    "\"INITIALISATIONS\"",
     "\"END\"",
     "\":=\"",
     "\"and\"",
