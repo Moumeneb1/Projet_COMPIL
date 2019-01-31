@@ -1,0 +1,274 @@
+PARSER_BEGIN(Hello)
+
+import java.io.StringReader;
+
+public class Hello {
+  
+    public static void main(String[] args) throws Exception {
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Hey : Boolean  ; Position : {Agrd, Red, Ferm} ; Xpos, Ypos : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm and Position :=true}");
+      Hello hello=new Hello(in);
+      Hello.words();
+    }
+
+}
+
+PARSER_END(Hello)
+
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+" >
+| < MOINS : "-" >
+| < MULTIPLICATION : "*" >
+| < DEVISION : "/" >
+}
+
+TOKEN :
+{
+  < LETTRE : ["a"-"z","A"-"Z"] >
+| < NUMERO : [ "0"-"9" ] >
+}
+
+
+
+
+
+TOKEN :
+{
+  < SEMICOLON : ";" >
+| < OBRACE  : "{" >
+| < CBRACE : "}" >
+| < OPAR : "(" >
+| < CPAR : ")" >
+| < COLON: ":">
+| < COMMA: ",">
+}
+
+TOKEN :
+{
+  < TYPE :
+  "Fenetre"
+| "Bouton"
+| "BoiteDialog"
+| "Panel"
+| "ChampsTexte"
+| "ComboBox"
+| "ListeDeroulante"
+| "CaseACocher"
+| "BoutonRadio"
+| "Icone" >
+}
+
+TOKEN :
+{
+  <BOOLEAN : "Boolean"|"BOOL">
+ |<INT:"int">
+}
+
+
+
+
+TOKEN :
+{
+< EvtType :"Click"
+  | "Drag"
+  | "DbClick"
+  | "ChrKeyPress"
+  | "NumKeyPress"
+  | "EnterKeyPress"
+  | "Drop">
+}
+
+TOKEN :
+{ <EVT_COND:
+   "<>"
+  | ">"
+  | "<"
+  | "="
+  >
+}
+
+TOKEN :
+{
+  < IF : "if" >
+| < THEN : "then" >
+| < DEBUT : "DEBUT">
+| < FIN : "FIN" >
+| < ACTION : "Actions" >
+| < COMP : "COMP" >
+| < PROP :"PROP" >
+| < EVT : "EVT" >
+| < INTERFACE : "INTERFACE" >
+| < TRUE : "True" >
+| < FALSE : "False" >
+| < INITIALISATION :"INITIALISATION">
+| <END:"END">
+| <AFFECT:":=">
+| <AND:"and">
+}
+
+
+TOKEN :
+{
+ <NUMERIQUE: (<NUMERO>)+>
+ |<ALPHANUMERIQUE: (<NUMERO>|<LETTRE>)+>
+}
+
+
+
+
+
+void words():
+{
+}
+{
+  <DEBUT>
+  <INTERFACE>
+  interfaces()
+  /*<INITIALISATION>
+  initialisations()
+  <ACTION>
+  actions()
+  <END>*/
+  <EOF>
+}
+void interfaces():
+{}
+{
+(
+  compo()
+)+
+}
+
+void initialisations():
+{}
+{
+ <DEBUT>
+}
+
+void actions():
+{}
+{
+<DEBUT>
+}
+
+
+void compo():
+{
+  Token test;
+}
+{
+  <COMP>
+  id()
+  <COLON>
+  <TYPE>
+  (<OPAR>
+  id()
+  <CPAR>)?
+  <SEMICOLON>
+  <PROP>
+  (prop())+
+
+  <EVT>
+  (evt())+
+
+}
+
+void attribut_val():
+{}{
+<TRUE>
+|<FALSE>
+|<NUMERIQUE>
+|<ALPHANUMERIQUE>
+}
+
+
+void prop_type():{}
+{
+ <INT>
+ |<BOOLEAN>
+ |(
+ <OBRACE>
+ <ALPHANUMERIQUE>
+ (<COMMA><ALPHANUMERIQUE>)*
+ <CBRACE>
+ )
+}
+
+void prop():
+{
+}
+{
+ id_prop()(<COMMA>id_prop())*
+ <COLON>
+  prop_type()
+ <SEMICOLON>
+}
+
+void evt():
+{
+  Token test99;
+}
+{
+ <EvtType>
+ <OBRACE>
+ <IF>
+ id_prop()
+ <EVT_COND>
+ attribut_val()
+ <THEN>
+ id_prop()
+ <AFFECT>
+ attribut_val()
+ (
+  <AND>
+   id_prop()
+   <AFFECT>
+   attribut_val()
+ )*
+ <CBRACE>
+
+
+
+}
+
+void prop_value():
+{
+}
+{
+ (< OBRACE >
+ attribut_val()
+ (","attribut_val())*
+ < CBRACE >)
+ |attribut_val()
+}
+
+
+
+void id():
+{
+}
+{
+ <ALPHANUMERIQUE>
+
+}
+
+void id_prop():
+{
+ Token t;
+}
+{
+ t=<ALPHANUMERIQUE>
+ {System.out.println(t);}
+}
+
+
+
