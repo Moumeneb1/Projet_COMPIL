@@ -1,33 +1,42 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 
 public class ComposantGui {
   String id;
   String type;
   String parent;
-  HashSet<Attribut> set_Attributs;
+  HashMap<String,Attribut> set_Attributs;
   ArrayList<Evt> set_events;
 
+    public String getId() {
+        return id;
+    }
+
+    public Attribut getAttribut(String id){
+        return this.set_Attributs.get(id);
+    }
     public ComposantGui(String id, String type, String parent) {
         this.id = id;
+
         this.type = type;
         this.parent = parent;
-        set_Attributs = new HashSet<>();
+        set_Attributs = new HashMap<>();
         set_events=new ArrayList<>();
     }
 
-    public void add__set_attributs(HashSet<Attribut> attributs){//concatener une chaine d'attribut
-        this.set_Attributs.addAll(attributs);
+    public void add__set_attributs(HashMap<String,Attribut> attributs){//concatener une chaine d'attribut
+        this.set_Attributs.putAll(attributs);
 
     }
+
 
 
     public  void add_set_event(Evt evt){
         this.set_events.add(evt);
     }
 
-    public void afficherComposantGui(){
+    /*public void afficherComposantGui(){
         System.out.println("id : "+id);
         System.out.println("parent : "+parent);
         System.out.println("type : "+type);
@@ -35,7 +44,7 @@ public class ComposantGui {
         while (it.hasNext()){
             ((Attribut)it.next()).showAttribut();
         }
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {

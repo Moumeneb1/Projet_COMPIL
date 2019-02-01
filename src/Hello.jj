@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Hello {
   
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var1 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; FenP::Visible := True; ACTIONS { Click(item) + Click(item) ;{Click(item) + Click(item)} }");
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var15 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; ACTIONS { {Click(item) + Click(item)} ;{Click(item) + Click(item)} }");
       Hello hello=new Hello(in);
       Hello.list=new HashMap();
       ComposantGui cmp;
@@ -144,66 +145,109 @@ TOKEN :
 
 void words():
 {
+   Program program;
 }
 {
   <DEBUT>
   <INTERFACE>
-  interfaces()
+  program=interfaces()//recupere la partie statique pour la faire passé a l'initialisation;
   <INITIALISATION>
-  initialisations()
+  initialisations(program)
   <ACTION>
-  actions()
+  Action_2()
   //<END>
   <EOF>
 }
-void interfaces():
+Program interfaces():
 {
-   HashSet<ComposantGui> set_composant_gui=new HashSet();
+   HashMap<String,ComposantGui> set_composant_gui=new HashMap();
    ComposantGui composant_tmp;
+   Program program;
 }
 {
 (
   composant_tmp=compo()
-  {set_composant_gui.add(composant_tmp);}
+  {set_composant_gui.put(composant_tmp.getId(),composant_tmp);}
 )+
+{program = new Program(set_composant_gui);
+ System.out.println(set_composant_gui);
+ return program;}
 }
 
-void initialisations():
+void initialisations(Program program):
 {}
 {
-  (init()<SEMICOLON>)+
+  (init(program)<SEMICOLON>)+
 
 
 }
 
-void init():{
-String t;
+void init(Program program):{
+String composant_id;
+String attribut_id;
+ComposantGui composant_gui=null;
+Attribut attribut=null;
+String val;
 }{
 
-id()
+composant_id=id()
+{
+    composant_gui=program.getComposant_Gui(composant_id);
+    if(composant_gui==null){
+     System.out.println("ERROR!");
+    }
+}
 <COLON><COLON>
-id()
+attribut_id=id()
+{attribut=composant_gui.getAttribut(attribut_id);
+   if(attribut==null){
+       System.out.println(attribut_id+"ERROR 2!");
+   }
+}
 <AFFECT>
-t=attribut_val()
+val=attribut_val()
+{attribut.updateValue(val);}
 
 
 
 }
 
 
-void actions():
+/*void actions():
 {}
 {
 <OBRACE>
-<EvtType>
-(<OPAR>
+(<EvtType>
+<OPAR>
 id()
 <CPAR>)?
 (
 (<SEMICOLON>|<PLUS>|<ALTERNATIF>)
-((<EvtType><OPAR>id()<CPAR>)|actions())
+(actions()|(<EvtType><OPAR>id()<CPAR>))
 )*
 <CBRACE>
+}*/
+
+void Action_2():
+{
+}
+{
+   ( <OBRACE>Action_2()<CBRACE>Action_core_A() )|  ( Action_core_B()Action_core_A() )
+
+}
+
+void Action_core_A():
+{
+}
+{
+     ((<SEMICOLON>|(<PLUS>|<ALTERNATIF>))Action_2()) | {}
+}
+
+void Action_core_B():
+{
+}
+{
+    <EvtType>(<OPAR>id()<CPAR>)Action_core_A()
 }
 
 
@@ -213,7 +257,7 @@ ComposantGui compo():
   String  id_parent=null;
   Token type;
   ComposantGui composant_gui;
-  HashSet<Attribut> tmp_HashSet;
+  HashMap<String,Attribut> tmp_HashMap;
   Evt tmp_evt;
 
 }
@@ -232,11 +276,11 @@ ComposantGui compo():
   <SEMICOLON>
   <PROP>
   (
-     tmp_HashSet=prop()
-     {composant_gui.add__set_attributs(tmp_HashSet);}
+     tmp_HashMap=prop()
+     {composant_gui.add__set_attributs(tmp_HashMap);}
 
   )+
-  {composant_gui.afficherComposantGui();}
+
 
   <EVT>
   (
@@ -281,9 +325,9 @@ String prop_type()://Poue le moment on ytilise les attributs simple
  )
 }
 
-HashSet prop():
+HashMap prop():
 {
-    HashSet<Attribut> attributs=new HashSet();//Store all the ids of this declaration
+    HashMap<String,Attribut> attributs=new HashMap();//Store all the ids of this declaration
     String tmp_id;//Temporare value to store the ids
     String tmp_type;
 }
@@ -291,22 +335,22 @@ HashSet prop():
  tmp_id=id_prop()
  {
  Attribut tmp_attribut;
- attributs.add(new Attribut(tmp_id));}//Get attributs
+ attributs.put(tmp_id,new Attribut(tmp_id));}//Get attributs
  (<COMMA>
  tmp_id=id_prop()
  {
- attributs.add(new Attribut(tmp_id));
+ attributs.put(tmp_id,new Attribut(tmp_id));
  }
  )*
  <COLON>
   tmp_type=prop_type()
   {
-   Iterator iter = attributs.iterator();
-   while (iter.hasNext()) {
-       ((Attribut)(iter.next())).setType(tmp_type);
-   }
+     for (Map.Entry<String, Attribut> entry : attributs.entrySet()) {
+     		    ((Attribut)entry.getValue()).setType(tmp_type);
+     }
 
-   }
+
+  }
  <SEMICOLON>
  {return attributs;}
 }

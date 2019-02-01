@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Hello implements HelloConstants {
 
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var1 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; FenP::Visible := True; ACTIONS { Click(item) + Click(item) ;{Click(item) + Click(item)} }");
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var15 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; ACTIONS { {Click(item) + Click(item)} ;{Click(item) + Click(item)} }");
       Hello hello=new Hello(in);
       Hello.list=new HashMap();
       ComposantGui cmp;
@@ -19,23 +20,25 @@ public class Hello implements HelloConstants {
     static HashMap<String,HashMap<String,String>> list ;
 
   static final public void words() throws ParseException {
+   Program program;
     jj_consume_token(DEBUT);
     jj_consume_token(INTERFACE);
-    interfaces();
+    program = interfaces();
     jj_consume_token(INITIALISATION);
-    initialisations();
+    initialisations(program);
     jj_consume_token(ACTION);
-    actions();
+    Action_2();
     jj_consume_token(0);
   }
 
-  static final public void interfaces() throws ParseException {
-   HashSet<ComposantGui> set_composant_gui=new HashSet();
+  static final public Program interfaces() throws ParseException {
+   HashMap<String,ComposantGui> set_composant_gui=new HashMap();
    ComposantGui composant_tmp;
+   Program program;
     label_1:
     while (true) {
       composant_tmp = compo();
-   set_composant_gui.add(composant_tmp);
+   set_composant_gui.put(composant_tmp.getId(),composant_tmp);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMP:
         ;
@@ -45,12 +48,16 @@ public class Hello implements HelloConstants {
         break label_1;
       }
     }
+ program = new Program(set_composant_gui);
+ System.out.println(set_composant_gui);
+ {if (true) return program;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void initialisations() throws ParseException {
+  static final public void initialisations(Program program) throws ParseException {
     label_2:
     while (true) {
-      init();
+      init(program);
       jj_consume_token(SEMICOLON);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ALPHANUMERIQUE:
@@ -63,73 +70,105 @@ public class Hello implements HelloConstants {
     }
   }
 
-  static final public void init() throws ParseException {
-String t;
-    id();
+  static final public void init(Program program) throws ParseException {
+String composant_id;
+String attribut_id;
+ComposantGui composant_gui=null;
+Attribut attribut=null;
+String val;
+    composant_id = id();
+    composant_gui=program.getComposant_Gui(composant_id);
+    if(composant_gui==null){
+     System.out.println("ERROR!");
+    }
     jj_consume_token(COLON);
     jj_consume_token(COLON);
-    id();
+    attribut_id = id();
+ attribut=composant_gui.getAttribut(attribut_id);
+   if(attribut==null){
+       System.out.println(attribut_id+"ERROR 2!");
+   }
     jj_consume_token(AFFECT);
-    t = attribut_val();
+    val = attribut_val();
+ attribut.updateValue(val);
   }
 
-  static final public void actions() throws ParseException {
-    jj_consume_token(OBRACE);
-    jj_consume_token(EvtType);
+/*void actions():
+{}
+{
+<OBRACE>
+(<EvtType>
+<OPAR>
+id()
+<CPAR>)?
+(
+(<SEMICOLON>|<PLUS>|<ALTERNATIF>)
+(actions()|(<EvtType><OPAR>id()<CPAR>))
+)*
+<CBRACE>
+}*/
+  static final public void Action_2() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case OPAR:
-      jj_consume_token(OPAR);
-      id();
-      jj_consume_token(CPAR);
+    case OBRACE:
+      jj_consume_token(OBRACE);
+      Action_2();
+      jj_consume_token(CBRACE);
+      Action_core_A();
+      break;
+    case EvtType:
+      Action_core_B();
+      Action_core_A();
       break;
     default:
       jj_la1[2] = jj_gen;
-      ;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-    label_3:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case PLUS:
-      case SEMICOLON:
-      case ALTERNATIF:
-        ;
-        break;
-      default:
-        jj_la1[3] = jj_gen;
-        break label_3;
-      }
+  }
+
+  static final public void Action_core_A() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case PLUS:
+    case SEMICOLON:
+    case ALTERNATIF:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
         jj_consume_token(SEMICOLON);
         break;
       case PLUS:
-        jj_consume_token(PLUS);
-        break;
       case ALTERNATIF:
-        jj_consume_token(ALTERNATIF);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case PLUS:
+          jj_consume_token(PLUS);
+          break;
+        case ALTERNATIF:
+          jj_consume_token(ALTERNATIF);
+          break;
+        default:
+          jj_la1[3] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
         break;
       default:
         jj_la1[4] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case EvtType:
-        jj_consume_token(EvtType);
-        jj_consume_token(OPAR);
-        id();
-        jj_consume_token(CPAR);
-        break;
-      case OBRACE:
-        actions();
-        break;
-      default:
-        jj_la1[5] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+      Action_2();
+      break;
+    default:
+      jj_la1[5] = jj_gen;
+
     }
-    jj_consume_token(CBRACE);
+  }
+
+  static final public void Action_core_B() throws ParseException {
+    jj_consume_token(EvtType);
+    jj_consume_token(OPAR);
+    id();
+    jj_consume_token(CPAR);
+    Action_core_A();
   }
 
   static final public ComposantGui compo() throws ParseException {
@@ -137,7 +176,7 @@ String t;
   String  id_parent=null;
   Token type;
   ComposantGui composant_gui;
-  HashSet<Attribut> tmp_HashSet;
+  HashMap<String,Attribut> tmp_HashMap;
   Evt tmp_evt;
     jj_consume_token(COMP);
     id_compo = id();
@@ -156,22 +195,21 @@ String t;
     composant_gui=new ComposantGui(id_compo,type.toString(),id_parent);
     jj_consume_token(SEMICOLON);
     jj_consume_token(PROP);
-    label_4:
+    label_3:
     while (true) {
-      tmp_HashSet = prop();
-      composant_gui.add__set_attributs(tmp_HashSet);
+      tmp_HashMap = prop();
+      composant_gui.add__set_attributs(tmp_HashMap);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ALPHANUMERIQUE:
         ;
         break;
       default:
         jj_la1[7] = jj_gen;
-        break label_4;
+        break label_3;
       }
     }
-   composant_gui.afficherComposantGui();
     jj_consume_token(EVT);
-    label_5:
+    label_4:
     while (true) {
       tmp_evt = evt();
     composant_gui.add_set_event(tmp_evt);
@@ -181,7 +219,7 @@ String t;
         break;
       default:
         jj_la1[8] = jj_gen;
-        break label_5;
+        break label_4;
       }
     }
    {if (true) return composant_gui;}
@@ -229,7 +267,7 @@ String t;
     case OBRACE:
       jj_consume_token(OBRACE);
       jj_consume_token(ALPHANUMERIQUE);
-      label_6:
+      label_5:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
@@ -237,7 +275,7 @@ String t;
           break;
         default:
           jj_la1[10] = jj_gen;
-          break label_6;
+          break label_5;
         }
         jj_consume_token(COMMA);
         jj_consume_token(ALPHANUMERIQUE);
@@ -252,14 +290,14 @@ String t;
     throw new Error("Missing return statement in function");
   }
 
-  static final public HashSet prop() throws ParseException {
-    HashSet<Attribut> attributs=new HashSet();//Store all the ids of this declaration
+  static final public HashMap prop() throws ParseException {
+    HashMap<String,Attribut> attributs=new HashMap();//Store all the ids of this declaration
     String tmp_id;//Temporare value to store the ids
     String tmp_type;
     tmp_id = id_prop();
  Attribut tmp_attribut;
- attributs.add(new Attribut(tmp_id));
-    label_7:
+ attributs.put(tmp_id,new Attribut(tmp_id));
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
@@ -267,18 +305,17 @@ String t;
         break;
       default:
         jj_la1[12] = jj_gen;
-        break label_7;
+        break label_6;
       }
       jj_consume_token(COMMA);
       tmp_id = id_prop();
- attributs.add(new Attribut(tmp_id));
+ attributs.put(tmp_id,new Attribut(tmp_id));
     }
     jj_consume_token(COLON);
     tmp_type = prop_type();
-   Iterator iter = attributs.iterator();
-   while (iter.hasNext()) {
-       ((Attribut)(iter.next())).setType(tmp_type);
-   }
+     for (Map.Entry<String, Attribut> entry : attributs.entrySet()) {
+                    ((Attribut)entry.getValue()).setType(tmp_type);
+     }
     jj_consume_token(SEMICOLON);
   {if (true) return attributs;}
     throw new Error("Missing return statement in function");
@@ -323,7 +360,7 @@ String t;
     case OBRACE:
       jj_consume_token(OBRACE);
       attribut_val();
-      label_8:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
@@ -331,7 +368,7 @@ String t;
           break;
         default:
           jj_la1[14] = jj_gen;
-          break label_8;
+          break label_7;
         }
         jj_consume_token(COMMA);
         attribut_val();
@@ -374,7 +411,7 @@ String t;
     jj_consume_token(AFFECT);
     tmp_src = attribut_val();
   set_Affectation.add(new Affectation(tmp_detination,tmp_src));
-    label_9:
+    label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
@@ -383,7 +420,7 @@ String t;
         break;
       default:
         jj_la1[16] = jj_gen;
-        break label_9;
+        break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
@@ -424,7 +461,7 @@ String t;
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20000000,0x0,0x4000,0x800820,0x800820,0x201000,0x4000,0x0,0x200000,0x0,0x20000,0x181000,0x20000,0x4000,0x20000,0x1000,0x800,0x800,};
+      jj_la1_0 = new int[] {0x20000000,0x0,0x201000,0x800020,0x800820,0x800820,0x4000,0x0,0x200000,0x0,0x20000,0x181000,0x20000,0x4000,0x20000,0x1000,0x800,0x800,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x186,0x0,0x0,0x0,0x0,0x0,0x186,0x40,0x40,};
