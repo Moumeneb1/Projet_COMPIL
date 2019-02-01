@@ -157,10 +157,14 @@ void words():
   <EOF>
 }
 void interfaces():
-{}
+{
+   HashSet<ComposantGui> set_composant_gui=new HashSet();
+   ComposantGui composant_tmp;
+}
 {
 (
-  compo()
+  composant_tmp=compo()
+  {set_composant_gui.add(composant_tmp);}
 )+
 }
 
@@ -203,7 +207,7 @@ id()
 }
 
 
-void compo():
+ComposantGui compo():
 {
   String id_compo;
   String  id_parent=null;
@@ -240,6 +244,7 @@ void compo():
    {composant_gui.add_set_event(tmp_evt);}
 
   )+
+  {return composant_gui;}
 
 }
 
@@ -314,9 +319,16 @@ Evt evt():
   Token event_cond;
   HashSet<Affectation> tmp_affectation;
   Evt event;
+  Token tmp=null;
+  String tmp_val=null;
 }
 {
  eventType=<EvtType>
+ (
+  <OPAR>
+  tmp=<ALPHANUMERIQUE>
+  <CPAR>
+ )?
  <OBRACE>
  <IF>
  cond_source=id_prop()
@@ -326,7 +338,8 @@ Evt evt():
  tmp_affectation=event_result()
  <CBRACE>
  {
-    event=new Evt(eventType.toString(),cond_source,cond_dest,event_cond.toString(),tmp_affectation);
+    if(tmp!=null)tmp_val=tmp.toString();
+    event=new Evt(eventType.toString(),tmp_val,cond_source,cond_dest,event_cond.toString(),tmp_affectation);
     return event;
  }
 

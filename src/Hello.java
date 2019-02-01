@@ -30,9 +30,12 @@ public class Hello implements HelloConstants {
   }
 
   static final public void interfaces() throws ParseException {
+   HashSet<ComposantGui> set_composant_gui=new HashSet();
+   ComposantGui composant_tmp;
     label_1:
     while (true) {
-      compo();
+      composant_tmp = compo();
+   set_composant_gui.add(composant_tmp);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMP:
         ;
@@ -129,7 +132,7 @@ String t;
     jj_consume_token(CBRACE);
   }
 
-  static final public void compo() throws ParseException {
+  static final public ComposantGui compo() throws ParseException {
   String id_compo;
   String  id_parent=null;
   Token type;
@@ -181,6 +184,8 @@ String t;
         break label_5;
       }
     }
+   {if (true) return composant_gui;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public String attribut_val() throws ParseException {
@@ -286,7 +291,19 @@ String t;
   Token event_cond;
   HashSet<Affectation> tmp_affectation;
   Evt event;
+  Token tmp=null;
+  String tmp_val=null;
     eventType = jj_consume_token(EvtType);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case OPAR:
+      jj_consume_token(OPAR);
+      tmp = jj_consume_token(ALPHANUMERIQUE);
+      jj_consume_token(CPAR);
+      break;
+    default:
+      jj_la1[13] = jj_gen;
+      ;
+    }
     jj_consume_token(OBRACE);
     jj_consume_token(IF);
     cond_source = id_prop();
@@ -295,7 +312,8 @@ String t;
     jj_consume_token(THEN);
     tmp_affectation = event_result();
     jj_consume_token(CBRACE);
-    event=new Evt(eventType.toString(),cond_source,cond_dest,event_cond.toString(),tmp_affectation);
+    if(tmp!=null)tmp_val=tmp.toString();
+    event=new Evt(eventType.toString(),tmp_val,cond_source,cond_dest,event_cond.toString(),tmp_affectation);
     {if (true) return event;}
     throw new Error("Missing return statement in function");
   }
@@ -312,7 +330,7 @@ String t;
           ;
           break;
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[14] = jj_gen;
           break label_8;
         }
         jj_consume_token(COMMA);
@@ -327,7 +345,7 @@ String t;
       attribut_val();
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -364,7 +382,7 @@ String t;
         ;
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
         break label_9;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -375,7 +393,7 @@ String t;
         jj_consume_token(SEMICOLON);
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[17] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -398,7 +416,7 @@ String t;
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[17];
+  static final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -406,10 +424,10 @@ String t;
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20000000,0x0,0x4000,0x800820,0x800820,0x201000,0x4000,0x0,0x200000,0x0,0x20000,0x181000,0x20000,0x20000,0x1000,0x800,0x800,};
+      jj_la1_0 = new int[] {0x20000000,0x0,0x4000,0x800820,0x800820,0x201000,0x4000,0x0,0x200000,0x0,0x20000,0x181000,0x20000,0x4000,0x20000,0x1000,0x800,0x800,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x186,0x0,0x0,0x0,0x0,0x186,0x40,0x40,};
+      jj_la1_1 = new int[] {0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x186,0x0,0x0,0x0,0x0,0x0,0x186,0x40,0x40,};
    }
 
   /** Constructor with InputStream. */
@@ -430,7 +448,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -444,7 +462,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -461,7 +479,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -471,7 +489,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -487,7 +505,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -496,7 +514,7 @@ String t;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -552,7 +570,7 @@ String t;
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 18; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
