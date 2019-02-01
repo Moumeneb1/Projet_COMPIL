@@ -1,15 +1,23 @@
 PARSER_BEGIN(Hello)
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class Hello {
   
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader(
-"DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Hey : Boolean  ; Position : {Agrd, Red, Ferm} ; Xpos, Ypos : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; FenP::Visible := True; ACTIONS { Click(item) + Click(item) ;{Click(item) + Click(item)} }");
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var1 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; FenP::Visible := True; ACTIONS { Click(item) + Click(item) ;{Click(item) + Click(item)} }");
       Hello hello=new Hello(in);
+      Hello.list=new HashMap();
+      ComposantGui cmp;
       Hello.words();
+
+
     }
+    static HashMap<String,HashMap<String,String>> list ;
 
 }
 
@@ -164,13 +172,15 @@ void initialisations():
 
 }
 
-void init():{}{
+void init():{
+String t;
+}{
 
 id()
 <COLON><COLON>
 id()
 <AFFECT>
-attribut_val()
+t=attribut_val()
 
 
 
@@ -195,38 +205,69 @@ id()
 
 void compo():
 {
-  Token test;
+  String id_compo;
+  String  id_parent=null;
+  Token type;
+  ComposantGui composant_gui;
+  HashSet<Attribut> tmp_HashSet;
+  Evt tmp_evt;
+
 }
 {
   <COMP>
-  id()
+  id_compo=id()
   <COLON>
-  <TYPE>
+  type=<TYPE>
   (<OPAR>
-  id()
+  id_parent=id()
   <CPAR>)?
+  {
+    composant_gui=new ComposantGui(id_compo,type.toString(),id_parent);
+  }
+
   <SEMICOLON>
   <PROP>
-  (prop())+
+  (
+     tmp_HashSet=prop()
+     {composant_gui.add__set_attributs(tmp_HashSet);}
+
+  )+
+  {composant_gui.afficherComposantGui();}
 
   <EVT>
-  (evt())+
+  (
+   tmp_evt = evt()
+   {composant_gui.add_set_event(tmp_evt);}
+
+  )+
 
 }
 
-void attribut_val():
-{}{
-<TRUE>
-|<FALSE>
-|<NUMERIQUE>
-|<ALPHANUMERIQUE>
-}
-
-
-void prop_type():{}
+String attribut_val():
 {
- <INT>
- |<BOOLEAN>
+    Token tmp;
+}{
+(tmp=<TRUE>
+{return tmp.toString();})
+|(tmp=<FALSE>
+{return tmp.toString();})
+|(tmp=<NUMERIQUE>
+{return tmp.toString();})
+|(tmp=<ALPHANUMERIQUE>
+{return tmp.toString();})
+
+}
+
+
+String prop_type()://Poue le moment on ytilise les attributs simple
+{
+    Token tmp_type;
+}
+{
+ tmp_type=<INT>
+ {return tmp_type.toString();}
+ |tmp_type=<BOOLEAN>
+ {return tmp_type.toString();}
  |(
  <OBRACE>
  <ALPHANUMERIQUE>
@@ -235,38 +276,59 @@ void prop_type():{}
  )
 }
 
-void prop():
+HashSet prop():
 {
+    HashSet<Attribut> attributs=new HashSet();//Store all the ids of this declaration
+    String tmp_id;//Temporare value to store the ids
+    String tmp_type;
 }
 {
- id_prop()(<COMMA>id_prop())*
+ tmp_id=id_prop()
+ {
+ Attribut tmp_attribut;
+ attributs.add(new Attribut(tmp_id));}//Get attributs
+ (<COMMA>
+ tmp_id=id_prop()
+ {
+ attributs.add(new Attribut(tmp_id));
+ }
+ )*
  <COLON>
-  prop_type()
+  tmp_type=prop_type()
+  {
+   Iterator iter = attributs.iterator();
+   while (iter.hasNext()) {
+       ((Attribut)(iter.next())).setType(tmp_type);
+   }
+
+   }
  <SEMICOLON>
+ {return attributs;}
 }
 
-void evt():
+Evt evt():
 {
-  Token test99;
+  Token eventType;
+  String cond_source;
+  String cond_dest;
+  Token event_cond;
+  HashSet<Affectation> tmp_affectation;
+  Evt event;
 }
 {
- <EvtType>
+ eventType=<EvtType>
  <OBRACE>
  <IF>
- id_prop()
- <EVT_COND>
- attribut_val()
+ cond_source=id_prop()
+ event_cond=<EVT_COND>
+ cond_dest=attribut_val()
  <THEN>
- id_prop()
- <AFFECT>
- attribut_val()
- (
-  (<AND>|<SEMICOLON>)
-   id_prop()
-   <AFFECT>
-   attribut_val()
- )*
+ tmp_affectation=event_result()
  <CBRACE>
+ {
+    event=new Evt(eventType.toString(),cond_source,cond_dest,event_cond.toString(),tmp_affectation);
+    return event;
+ }
 
 
 
@@ -285,22 +347,45 @@ void prop_value():
 
 
 
-void id():
+String id():
 {
+  Token t;
 }
 {
- <ALPHANUMERIQUE>
+ t=<ALPHANUMERIQUE>
+ {return t.toString();}
 
 }
 
-void id_prop():
+String id_prop():
 {
  Token t;
 }
 {
  t=<ALPHANUMERIQUE>
- {System.out.println(t);}
+ {return t.toString();}
 }
 
 
+HashSet<Affectation> event_result():
+{
+    Affectation affectation;
+    String tmp_src;
+    String tmp_detination;
+    HashSet<Affectation> set_Affectation=new HashSet();
+}
+{
+tmp_detination=id_prop()
+ <AFFECT>
+ tmp_src=attribut_val()
+ {set_Affectation.add(new Affectation(tmp_detination,tmp_src));}
+ (
+  (<AND>|<SEMICOLON>)
+   tmp_detination=id_prop()
+   <AFFECT>
+   tmp_src=attribut_val()
+   {set_Affectation.add(new Affectation(tmp_detination,tmp_src));}
+ )*
+ {return set_Affectation;}
+}
 
