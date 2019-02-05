@@ -43,25 +43,25 @@ public interface HelloConstants {
   /** RegularExpression Id. */
   int EvtType = 21;
   /** RegularExpression Id. */
-  int EVT_COND = 22;
+  int ALTERNATIF = 22;
   /** RegularExpression Id. */
-  int ALTERNATIF = 23;
+  int IF = 23;
   /** RegularExpression Id. */
-  int IF = 24;
+  int THEN = 24;
   /** RegularExpression Id. */
-  int THEN = 25;
+  int DEBUT = 25;
   /** RegularExpression Id. */
-  int DEBUT = 26;
+  int FIN = 26;
   /** RegularExpression Id. */
-  int FIN = 27;
+  int ACTION = 27;
   /** RegularExpression Id. */
-  int ACTION = 28;
+  int COMP = 28;
   /** RegularExpression Id. */
-  int COMP = 29;
+  int PROP = 29;
   /** RegularExpression Id. */
-  int PROP = 30;
+  int EVT = 30;
   /** RegularExpression Id. */
-  int EVT = 31;
+  int INV = 31;
   /** RegularExpression Id. */
   int INTERFACE = 32;
   /** RegularExpression Id. */
@@ -80,6 +80,8 @@ public interface HelloConstants {
   int NUMERIQUE = 39;
   /** RegularExpression Id. */
   int ALPHANUMERIQUE = 40;
+  /** RegularExpression Id. */
+  int EVT_COND = 41;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -108,7 +110,6 @@ public interface HelloConstants {
     "<BOOLEAN>",
     "\"int\"",
     "<EvtType>",
-    "<EVT_COND>",
     "\"~\"",
     "\"if\"",
     "\"then\"",
@@ -118,6 +119,7 @@ public interface HelloConstants {
     "\"COMP\"",
     "\"PROP\"",
     "\"EVT\"",
+    "\"INV\"",
     "\"INTERFACE\"",
     "\"True\"",
     "\"False\"",
@@ -127,6 +129,8 @@ public interface HelloConstants {
     "\"and\"",
     "<NUMERIQUE>",
     "<ALPHANUMERIQUE>",
+    "<EVT_COND>",
+    "\".\"",
   };
 
 }

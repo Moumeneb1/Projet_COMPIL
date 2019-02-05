@@ -105,14 +105,13 @@ TOKEN :
   | "Drop">
 }
 
-TOKEN :
-{ <EVT_COND:
-   "<>"
-  | ">"
-  | "<"
-  | "="
-  >
-}
+
+
+
+
+
+
+
 
 
 
@@ -131,6 +130,7 @@ TOKEN :
 | < COMP : "COMP" >
 | < PROP :"PROP" >
 | < EVT : "EVT" >
+| <INV : "INV" >
 | < INTERFACE : "INTERFACE" >
 | < TRUE : "True" >
 | < FALSE : "False" >
@@ -145,6 +145,15 @@ TOKEN :
 {
  <NUMERIQUE: (<NUMERO>)+>
  |<ALPHANUMERIQUE: (<NUMERO>|<LETTRE>)+>
+}
+
+TOKEN :
+{ <EVT_COND:
+  "="
+  | "<>"
+  | ">"
+  | "<"
+  >
 }
 
 
@@ -166,7 +175,7 @@ void words():
   <ACTION>
   Action_2(etat0,null,automate)
   {automate.afficher();}
-  //<END>
+  <FIN>
   <EOF>
 }
 Program interfaces():
@@ -400,6 +409,7 @@ ComposantGui compo():
   }
 
   <SEMICOLON>
+
   <PROP>
   (
      tmp_HashMap=prop()
@@ -407,7 +417,9 @@ ComposantGui compo():
 
   )+
 
-
+  (<INV>
+    <ALPHANUMERIQUE><EVT_COND>(<TRUE>|<FALSE>)<SEMICOLON>
+  )?
   <EVT>
   (
    tmp_evt = evt()
@@ -547,7 +559,7 @@ String id_prop():
  Token t;
 }
 {
- t=<ALPHANUMERIQUE>
+ t=<ALPHANUMERIQUE>((".")<ALPHANUMERIQUE>)?
  {return t.toString();}
 }
 
