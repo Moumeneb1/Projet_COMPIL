@@ -10,8 +10,16 @@ import java.util.Map;
 public class Hello {
   
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var15 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; ACTIONS { {Click(item) + Click(item)} ;{Click(item) + Click(item)} }");
-      Hello hello=new Hello(in);
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var : Boolean ; Position2, Var2 : int ; EVT Drag {if Position = False then Position := 5} Click {if Position = True then Position := 8 } COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := True; ACTIONS  { Click (Plan)~ Drag (Plan) }~Click (Plan)");
+       String input=new String();
+       String tmp;
+       FastScanner fastScanner = new FastScanner("/home/moumene/IdeaProjects/Hello/src/input.ihm","ouput.ihm");
+       System.out.println("aloha");
+       while((tmp=fastScanner.nextLine())!=null){
+              input+=" "+tmp;
+       }
+      Hello hello=new Hello(new StringReader(input));
+      //Hello hello=new Hello(in);
       Hello.list=new HashMap();
       ComposantGui cmp;
       Hello.words();
@@ -146,6 +154,8 @@ TOKEN :
 void words():
 {
    Program program;
+   Etat etat0=new Etat();
+   Automate automate=new Automate();
 }
 {
   <DEBUT>
@@ -154,7 +164,8 @@ void words():
   <INITIALISATION>
   initialisations(program)
   <ACTION>
-  Action_2()
+  Action_2(etat0,null,automate)
+  {automate.afficher();}
   //<END>
   <EOF>
 }
@@ -170,7 +181,7 @@ Program interfaces():
   {set_composant_gui.put(composant_tmp.getId(),composant_tmp);}
 )+
 {program = new Program(set_composant_gui);
- System.out.println(set_composant_gui);
+ //System.out.println(set_composant_gui);
  return program;}
 }
 
@@ -228,26 +239,139 @@ id()
 <CBRACE>
 }*/
 
-void Action_2():
+Etat Action_2(Etat etat,Etat voisin,Automate automate):
 {
+    Etat nouv_etat1;
+    Etat nouv_etat2;
+    Etat tmp;
+    String type=null;
+    PassString passString=new PassString(type);
+    System.out.println("etatenentré"+etat.id);
 }
 {
-   ( <OBRACE>Action_2()<CBRACE>Action_core_A() )|  ( Action_core_B()Action_core_A() )
+   (<OBRACE>
+   {System.out.println("ACTION2 recursif");}
+   nouv_etat1=Action_2(etat,voisin,automate)
+   <CBRACE>nouv_etat2=Action_core_A(etat,nouv_etat1,passString,automate )){
+   {
+           type=passString.string;
+           if(nouv_etat2==null){
+                return nouv_etat1;
+           }
+           System.out.println("TYPE"+type);
+           if(type.equals("+")){
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+               tmp=new Etat();
+               automate.addTransition(nouv_etat1,tmp,"Epsilon");
+               automate.addTransition(nouv_etat2,tmp,"Epsilon");
+               nouv_etat2=tmp;
+               //il faut ajouter les transition aprés !!!
+           }
+           return nouv_etat2;
+       }
+   }
+   |
+   ({System.out.println("ACTION2 non recursif");}
+    nouv_etat1=Action_core_B(etat,voisin,automate)
+    {System.out.println("Onasortiedeb"+nouv_etat1.id);}
+    nouv_etat2=Action_core_A(etat,nouv_etat1,passString,automate)
+    {
+        type=passString.string;
+        System.out.println("whyyyyy"+type);
+        if(nouv_etat2==null){
+        System.out.println("aloha");
+             return nouv_etat1;
+
+        }
+        System.out.println("TYPE"+type);
+        if(type=="+"){
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            tmp=new Etat();//il faut ajouter les transition aprés !!!
+            automate.addTransition(nouv_etat1,tmp,"Epsilon");
+            automate.addTransition(nouv_etat2,tmp,"Epsilon");
+            nouv_etat2=tmp;
+        }
+        return nouv_etat2;
+    }
+   )
 
 }
 
-void Action_core_A():
+Etat Action_core_A(Etat etat1,Etat etat2,PassString passString,Automate automate):
 {
+    Token tmp_type;
+    Etat nouveau_etat;
+    Etat tmp_etat;
+
 }
 {
-     ((<SEMICOLON>|(<PLUS>|<ALTERNATIF>))Action_2()) | {}
+     ((tmp_type=<SEMICOLON>|(tmp_type=<PLUS>|tmp_type=<ALTERNATIF>))
+         {
+             passString.string=tmp_type.toString();
+             System.out.println("core A non vide"+passString.string);
+             if(passString.string.equals("+") ){
+                nouveau_etat=Action_2(etat1,null,automate);
+             }
+             else if(passString.string.equals("~")){
+                    nouveau_etat=Action_2(etat1,etat2,automate);
+              }else{
+                nouveau_etat=Action_2(etat2,null,automate);
+              }
+              System.out.println("cheking type"+passString.string+"//");
+              return nouveau_etat;
+         }
+
+
+        ) |
+        ({/*epsilon*/}
+        {System.out.println("core A vide");return null;})
 }
 
-void Action_core_B():
+Etat Action_core_B(Etat etat,Etat voisin/*utilisé dans le cas du choix*/,Automate automate)://le seul ou on a du calcule
 {
+    Token eventToken;
+    String compsant_id;
+    System.out.println("B was here");
 }
 {
-    <EvtType>(<OPAR>id()<CPAR>)Action_core_A()
+    eventToken=<EvtType>
+    (<OPAR>
+    compsant_id=id()<CPAR>)
+    //Action_core_A()
+    {
+        if(voisin==null){
+            Etat nouv_etat=new Etat();
+            automate.addTransition(etat,nouv_etat,eventToken.toString());
+            return nouv_etat;
+        }else{
+            automate.addTransition(etat,voisin,eventToken.toString()+"("+compsant_id+")");
+            return voisin;
+        }
+    }
+
+}
+
+void appel_func():{
+    Token eventToken;
+    String compsant_id;
+}{
+eventToken=<EvtType>
+(<OPAR>
+compsant_id=id()<CPAR>)
+{
+
+   Etat etat=new Etat();
+  /*  String evt=eventToken.toString();
+    //System.out.println(compsant_id+"asubit"+evt);
+    Program program1=new Program(program);//Nouvelle etat
+    program1.AfficherEtat();
+    ComposantGui composantGui=program1.getComposant_Gui(compsant_id);
+    Evt event=composantGui.getEvt(evt);
+    //System.out.println(event.attribut_Cond1);
+    composantGui.appliquerEvent(event);
+    program1.AfficherEtat();*/
+}
+
 }
 
 
@@ -260,10 +384,12 @@ ComposantGui compo():
   HashMap<String,Attribut> tmp_HashMap;
   Evt tmp_evt;
 
+
 }
 {
   <COMP>
   id_compo=id()
+  {System.out.println(id_compo);}
   <COLON>
   type=<TYPE>
   (<OPAR>
@@ -299,6 +425,8 @@ String attribut_val():
 (tmp=<TRUE>
 {return tmp.toString();})
 |(tmp=<FALSE>
+{return tmp.toString();})
+|(tmp=<NUMERO>
 {return tmp.toString();})
 |(tmp=<NUMERIQUE>
 {return tmp.toString();})
@@ -391,7 +519,7 @@ Evt evt():
 
 }
 
-void prop_value():
+/*void prop_value():
 {
 }
 {
@@ -400,7 +528,7 @@ void prop_value():
  (","attribut_val())*
  < CBRACE >)
  |attribut_val()
-}
+}*/
 
 
 

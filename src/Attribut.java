@@ -4,7 +4,7 @@ import java.util.TreeSet;
 public class Attribut {
     String id;
     String type;
-    String values;//a transformer aprés en un treemap
+    String value="NULL";//a transformer aprés en un treemap
 
     public void setType(String type) {
         this.type = type;
@@ -16,7 +16,7 @@ public class Attribut {
     }
 
     public void updateValue(String value){
-        this.values=value;
+        this.value=value;
     }
 
     @Override
@@ -36,5 +36,11 @@ public class Attribut {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public Attribut(Attribut attribut) {//Fonction pour cloner un nouveau etat
+        this.id=new String(attribut.id);
+        this.type=new String(attribut.type);
+        this.value=new String(attribut.value);
     }
 }

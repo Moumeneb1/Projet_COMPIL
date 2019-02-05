@@ -9,8 +9,16 @@ import java.util.Map;
 public class Hello implements HelloConstants {
 
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var15 : Boolean ; Position2, Var2 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := Argd; ACTIONS { {Click(item) + Click(item)} ;{Click(item) + Click(item)} }");
-      Hello hello=new Hello(in);
+      StringReader in=new StringReader("DEBUT INTERFACE COMP FenP : Fenetre ; PROP Position, Var : Boolean ; Position2, Var2 : int ; EVT Drag {if Position = False then Position := 5} Click {if Position = True then Position := 8 } COMP FenPP : Fenetre (papa) ; PROP Position, Var : int ; Positionn, Var3,var4 : int ; EVT Drag {if Position <> Ferm then Position := Ferm} Click {if Position <> Ferm then Position := Ferm ; Position :=true} INITIALISATIONS FenP::Position := True; ACTIONS  { Click (Plan)~ Drag (Plan) }~Click (Plan)");
+       String input=new String();
+       String tmp;
+       FastScanner fastScanner = new FastScanner("/home/moumene/IdeaProjects/Hello/src/input.ihm","ouput.ihm");
+       System.out.println("aloha");
+       while((tmp=fastScanner.nextLine())!=null){
+              input+=" "+tmp;
+       }
+      Hello hello=new Hello(new StringReader(input));
+      //Hello hello=new Hello(in);
       Hello.list=new HashMap();
       ComposantGui cmp;
       Hello.words();
@@ -21,13 +29,16 @@ public class Hello implements HelloConstants {
 
   static final public void words() throws ParseException {
    Program program;
+   Etat etat0=new Etat();
+   Automate automate=new Automate();
     jj_consume_token(DEBUT);
     jj_consume_token(INTERFACE);
     program = interfaces();
     jj_consume_token(INITIALISATION);
     initialisations(program);
     jj_consume_token(ACTION);
-    Action_2();
+    Action_2(etat0,null,automate);
+   automate.afficher();
     jj_consume_token(0);
   }
 
@@ -49,7 +60,7 @@ public class Hello implements HelloConstants {
       }
     }
  program = new Program(set_composant_gui);
- System.out.println(set_composant_gui);
+ //System.out.println(set_composant_gui);
  {if (true) return program;}
     throw new Error("Missing return statement in function");
   }
@@ -107,42 +118,87 @@ id()
 )*
 <CBRACE>
 }*/
-  static final public void Action_2() throws ParseException {
+  static final public Etat Action_2(Etat etat,Etat voisin,Automate automate) throws ParseException {
+    Etat nouv_etat1;
+    Etat nouv_etat2;
+    Etat tmp;
+    String type=null;
+    PassString passString=new PassString(type);
+    System.out.println("etatenentr\u00e9"+etat.id);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case OBRACE:
       jj_consume_token(OBRACE);
-      Action_2();
+    System.out.println("ACTION2 recursif");
+      nouv_etat1 = Action_2(etat,voisin,automate);
       jj_consume_token(CBRACE);
-      Action_core_A();
+      nouv_etat2 = Action_core_A(etat,nouv_etat1,passString,automate);
+   {
+           type=passString.string;
+           if(nouv_etat2==null){
+                {if (true) return nouv_etat1;}
+           }
+           System.out.println("TYPE"+type);
+           if(type.equals("+")){
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+               tmp=new Etat();
+               automate.addTransition(nouv_etat1,tmp,"Epsilon");
+               automate.addTransition(nouv_etat2,tmp,"Epsilon");
+               nouv_etat2=tmp;
+               //il faut ajouter les transition aprés !!!
+           }
+           {if (true) return nouv_etat2;}
+       }
       break;
     case EvtType:
-      Action_core_B();
-      Action_core_A();
+     System.out.println("ACTION2 non recursif");
+      nouv_etat1 = Action_core_B(etat,voisin,automate);
+     System.out.println("Onasortiedeb"+nouv_etat1.id);
+      nouv_etat2 = Action_core_A(etat,nouv_etat1,passString,automate);
+        type=passString.string;
+        System.out.println("whyyyyy"+type);
+        if(nouv_etat2==null){
+        System.out.println("aloha");
+             {if (true) return nouv_etat1;}
+
+        }
+        System.out.println("TYPE"+type);
+        if(type=="+"){
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            tmp=new Etat();//il faut ajouter les transition aprés !!!
+            automate.addTransition(nouv_etat1,tmp,"Epsilon");
+            automate.addTransition(nouv_etat2,tmp,"Epsilon");
+            nouv_etat2=tmp;
+        }
+        {if (true) return nouv_etat2;}
       break;
     default:
       jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void Action_core_A() throws ParseException {
+  static final public Etat Action_core_A(Etat etat1,Etat etat2,PassString passString,Automate automate) throws ParseException {
+    Token tmp_type;
+    Etat nouveau_etat;
+    Etat tmp_etat;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PLUS:
     case SEMICOLON:
     case ALTERNATIF:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
-        jj_consume_token(SEMICOLON);
+        tmp_type = jj_consume_token(SEMICOLON);
         break;
       case PLUS:
       case ALTERNATIF:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case PLUS:
-          jj_consume_token(PLUS);
+          tmp_type = jj_consume_token(PLUS);
           break;
         case ALTERNATIF:
-          jj_consume_token(ALTERNATIF);
+          tmp_type = jj_consume_token(ALTERNATIF);
           break;
         default:
           jj_la1[3] = jj_gen;
@@ -155,20 +211,64 @@ id()
         jj_consume_token(-1);
         throw new ParseException();
       }
-      Action_2();
+             passString.string=tmp_type.toString();
+             System.out.println("core A non vide"+passString.string);
+             if(passString.string.equals("+") ){
+                nouveau_etat=Action_2(etat1,null,automate);
+             }
+             else if(passString.string.equals("~")){
+                    nouveau_etat=Action_2(etat1,etat2,automate);
+              }else{
+                nouveau_etat=Action_2(etat2,null,automate);
+              }
+              System.out.println("cheking type"+passString.string+"//");
+              {if (true) return nouveau_etat;}
       break;
     default:
       jj_la1[5] = jj_gen;
 
+         System.out.println("core A vide");{if (true) return null;}
     }
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void Action_core_B() throws ParseException {
-    jj_consume_token(EvtType);
+  static final public Etat Action_core_B(Etat etat,Etat voisin/*utilisé dans le cas du choix*/,Automate automate) throws ParseException {
+    Token eventToken;
+    String compsant_id;
+    System.out.println("B was here");
+    eventToken = jj_consume_token(EvtType);
     jj_consume_token(OPAR);
-    id();
+    compsant_id = id();
     jj_consume_token(CPAR);
-    Action_core_A();
+        if(voisin==null){
+            Etat nouv_etat=new Etat();
+            automate.addTransition(etat,nouv_etat,eventToken.toString());
+            {if (true) return nouv_etat;}
+        }else{
+            automate.addTransition(etat,voisin,eventToken.toString()+"("+compsant_id+")");
+            {if (true) return voisin;}
+        }
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public void appel_func() throws ParseException {
+    Token eventToken;
+    String compsant_id;
+    eventToken = jj_consume_token(EvtType);
+    jj_consume_token(OPAR);
+    compsant_id = id();
+    jj_consume_token(CPAR);
+   Etat etat=new Etat();
+  /*  String evt=eventToken.toString();
+    //System.out.println(compsant_id+"asubit"+evt);
+    Program program1=new Program(program);//Nouvelle etat
+    program1.AfficherEtat();
+    ComposantGui composantGui=program1.getComposant_Gui(compsant_id);
+    Evt event=composantGui.getEvt(evt);
+    //System.out.println(event.attribut_Cond1);
+    composantGui.appliquerEvent(event);
+    program1.AfficherEtat();*/
+
   }
 
   static final public ComposantGui compo() throws ParseException {
@@ -180,6 +280,7 @@ id()
   Evt tmp_evt;
     jj_consume_token(COMP);
     id_compo = id();
+   System.out.println(id_compo);
     jj_consume_token(COLON);
     type = jj_consume_token(TYPE);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -235,6 +336,10 @@ id()
       break;
     case FALSE:
       tmp = jj_consume_token(FALSE);
+ {if (true) return tmp.toString();}
+      break;
+    case NUMERO:
+      tmp = jj_consume_token(NUMERO);
  {if (true) return tmp.toString();}
       break;
     case NUMERIQUE:
@@ -355,39 +460,16 @@ id()
     throw new Error("Missing return statement in function");
   }
 
-  static final public void prop_value() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case OBRACE:
-      jj_consume_token(OBRACE);
-      attribut_val();
-      label_7:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case COMMA:
-          ;
-          break;
-        default:
-          jj_la1[14] = jj_gen;
-          break label_7;
-        }
-        jj_consume_token(COMMA);
-        attribut_val();
-      }
-      jj_consume_token(CBRACE);
-      break;
-    case TRUE:
-    case FALSE:
-    case NUMERIQUE:
-    case ALPHANUMERIQUE:
-      attribut_val();
-      break;
-    default:
-      jj_la1[15] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
+/*void prop_value():
+{
+}
+{
+ (< OBRACE >
+ attribut_val()
+ (","attribut_val())*
+ < CBRACE >)
+ |attribut_val()
+}*/
   static final public String id() throws ParseException {
   Token t;
     t = jj_consume_token(ALPHANUMERIQUE);
@@ -411,7 +493,7 @@ id()
     jj_consume_token(AFFECT);
     tmp_src = attribut_val();
   set_Affectation.add(new Affectation(tmp_detination,tmp_src));
-    label_8:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
@@ -419,8 +501,8 @@ id()
         ;
         break;
       default:
-        jj_la1[16] = jj_gen;
-        break label_8;
+        jj_la1[14] = jj_gen;
+        break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
@@ -430,7 +512,7 @@ id()
         jj_consume_token(SEMICOLON);
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[15] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -453,7 +535,7 @@ id()
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[18];
+  static final private int[] jj_la1 = new int[16];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -461,10 +543,10 @@ id()
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20000000,0x0,0x201000,0x800020,0x800820,0x800820,0x4000,0x0,0x200000,0x0,0x20000,0x181000,0x20000,0x4000,0x20000,0x1000,0x800,0x800,};
+      jj_la1_0 = new int[] {0x20000000,0x0,0x201000,0x800020,0x800820,0x800820,0x4000,0x0,0x200000,0x400,0x20000,0x181000,0x20000,0x4000,0x800,0x800,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x186,0x0,0x0,0x0,0x0,0x0,0x186,0x40,0x40,};
+      jj_la1_1 = new int[] {0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x186,0x0,0x0,0x0,0x0,0x40,0x40,};
    }
 
   /** Constructor with InputStream. */
@@ -485,7 +567,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -499,7 +581,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -516,7 +598,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -526,7 +608,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -542,7 +624,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -551,7 +633,7 @@ id()
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -607,7 +689,7 @@ id()
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 18; i++) {
+    for (int i = 0; i < 16; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

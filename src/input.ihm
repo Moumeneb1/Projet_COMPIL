@@ -1,0 +1,67 @@
+DEBUT
+INTERFACE
+COMP FenP : Fenetre ;
+	PROP
+		Visible  : Boolean ;
+		Xpos, Ypos : int ;
+	EVT
+		Click {if Position <> Ferm then Position:= Ferm}
+		Click {if Visible = False then visible := True}
+COMP MenuH: Panel (Fenp) ;
+	PROP
+		Visible, Actif :Boolean;
+	INV
+		Visible = True ;
+	EVT
+		Click(Item) {if Actif =True then ItemChoisi:=Item and Actif:=False}
+		
+COMP Commande: Panel (MenuH) ;
+	PROP
+		Deployer :Boolean;
+		
+	EVT
+		EnterKeyPress(Item) {if Deployer = True then Option := Projection ; Item.Deployer := False}
+		
+INITIALISATIONS
+  	 FenP::Position := Argd;
+  	 FenP::Visible := True;
+  	 FenP::Xpos := 10;
+	 FenP::Ypos := 10;
+	 MenuH::ItemChoisi := Fichier;
+	 MenuH::Visible:= True;
+	 MenuH::Actif := True;
+	 Commande::Option := Projection;
+	 Commande::Deployer:=True;
+
+ACTIONS
+	{
+	 Click (Plan);
+	  Drag (Plan)
+	};
+	{
+		{
+		  DbClick (Plan) ;
+		  {
+			Click(BtProjection)~
+			{
+			  Click(Commande);
+			  Click(Projection)
+			 }
+		  }
+		}+
+		{
+          DbClick(Plan);
+          DbClick(Plan);
+          {
+          	Click(BtDistance)~
+          	{
+          		Click(Commande);
+          		Click(Distance)
+          	}
+           
+          }
+       }
+	}
+FIN
+
+{ Click (Plan); Drag (Plan) }; { { DbClick (Plan) ; { Click(BtProjection)~ { Click(Commande); Click(Projection) } } }+ { DbClick(Plan); DbClick(Plan); { Click(BtDistance)~ { Click(Commande); Click(Distance) }   } } } 
